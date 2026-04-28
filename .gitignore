@@ -1,0 +1,43 @@
+# --- Carpeta de compilación y binarios ---
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+
+# --- Maven / Gradle wrapper ---
+.mvn/wrapper/maven-wrapper.jar
+.gradle/
+bin/
+
+# --- IDEs (IntelliJ, Eclipse, VS Code, NetBeans) ---
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+.vscode/
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# --- Configuración Sensible (CRÍTICO) ---
+# Aquí es donde ocultas tus contraseñas de DB y API Keys 
+.env
+*.properties
+*.yml
+!src/main/resources/application-example.properties
+
+# --- Sistema y Logs ---
+*.log
+.DS_Store
+Thumbs.db
+temp/

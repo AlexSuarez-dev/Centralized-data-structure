@@ -1,0 +1,20 @@
+package com.barcelonaturisme.inventory.core.domain;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Entity
+@Table(name = "usuari")
+@Data
+public class Usuari {
+
+    @Id
+    @Column(name = "nom", length = 25)
+    private String nom;
+
+    private Integer telefon;
+
+    @OneToOne
+    @JoinColumn(name = "id_actiu", referencedColumnName = "id")
+    private Ordinador ordinador; // Relación directa con el PC/Portatil
+}
