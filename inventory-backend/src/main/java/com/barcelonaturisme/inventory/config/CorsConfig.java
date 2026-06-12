@@ -1,4 +1,4 @@
-package com.barcelonaturisme.inventory.config;
+package com.barcelonaturisme.inventory.config; // Ajusta el package según tu estructura actual
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +13,16 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**") // Solo aplicamos CORS a las rutas de la API
-                        .allowedOrigins("http://localhost:3000", "http://127.0.0.1:5500") // Permite tu frontend
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                registry.addMapping("/api/**") // Aplica a todos los endpoints de tu API
+                        .allowedOrigins(
+                            "http://localhost",       // Tu nuevo frontend en Docker (Nginx)
+                            "http://127.0.0.1",       // Alternativa de Docker
+                            "http://localhost:5500",  // Por si vuelves a usar Live Server
+                            "http://127.0.0.1:5500"
+                        )
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Verbos permitidos
+                        .allowedHeaders("*") // Permite cualquier cabecera
+                        .allowCredentials(true); // Permite enviar cookies o tokens si los tuvieras
             }
         };
     }

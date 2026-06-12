@@ -3,17 +3,34 @@ import { fetchAndRender } from './utils.js';
 $(document).ready(function () {
     const API_URL = 'http://localhost:8080/api/v1/ordinadors';
     const $tbody = $('#tabla-body');
+    // Inicializar Tooltips de Bootstrap 5 de forma delegada para contenido dinámico
+    new bootstrap.Tooltip(document.getElementById('tabla-body'), {
+        selector: '[data-bs-toggle="tooltip"]'
+    });
 
     // --- 1. Lógica de renderizado específico para Ordenadores ---
     function crearFilaOrdinador(item) {
         const fecha = item.purchaseDate || 'Sin fecha';
-        const obs = item.observacions || '-';
+        // --- Lógica de las notas ---
+        let obsHtml = '<span class="text-muted">-</span>';
+        if (item.observacions && item.observacions.trim() !== '') {
+            // Si hay notas, creamos un icono con el Tooltip de Bootstrap
+            obsHtml = `
+            <i class="bi bi-info-circle-fill text-primary" 
+               data-bs-toggle="tooltip" 
+               data-bs-placement="top" 
+               title="${item.observacions}" 
+               style="cursor: help; font-size: 1.1rem;">
+            </i>`;
+        }
 
         let colorClase = '';
         if (item.estat == 1) colorClase = 'text-success';
         else if (item.estat == 2) colorClase = 'text-warning';
         else colorClase = 'text-danger';
-        
+
+        // Empaquetamos todo el objeto en un atributo HTML de forma segura
+        const itemData = encodeURIComponent(JSON.stringify(item));
 
         return `
             <tr>
@@ -31,9 +48,39 @@ $(document).ready(function () {
                     </div>
                 </td>
                 <td><small>${fecha}</small></td>
-                <td><i class="text-muted" style="font-size: 0.8rem;">${obs}</i></td>
+                <td class="text-center">${obsHtml}</td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary btn-editar" data-item="${itemData}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </td>
             </tr>`;
     }
+
+
+    $tbody.on('click', '.btn-editar', function () {
+        // 1. Extraer y desencriptar los datos del botón
+        const item = JSON.parse(decodeURIComponent($(this).data('item')));
+
+        // 2. Rellenar todos los campos del formulario
+        $('#ord-id').val(item.id);
+        $('#ord-nom').val(item.nom);
+        $('#ord-serial').val(item.serialNumber);
+        $('#ord-type').val(item.type);
+        $('#ord-model').val(item.model);
+        $('#ord-ubicacio').val(item.ubicacio);
+        $('#ord-ram').val(item.ram);
+        $('#ord-hdd').val(item.hdd);
+        $('#ord-so').val(item.so);
+        $('#ord-estat').val(item.estat);
+        $('#ord-date').val(item.purchaseDate);
+
+        // 3. Cambiar el título del Modal para que el usuario sepa qué hace
+        $('#modalTitle').text('Editar Equipo: ' + item.nom);
+
+        // 4. Mostrar el Modal
+        $('#modalOrdinador').modal('show');
+    });
 
     // --- 2. Evento de Búsqueda con DEBOUNCE ---
     let timer;

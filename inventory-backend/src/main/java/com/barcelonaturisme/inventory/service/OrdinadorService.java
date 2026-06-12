@@ -28,10 +28,7 @@ public class OrdinadorService {
         } else {
             lista = ordinadorRepository.findAll();
         }
-        // Print the 'estat' of the first object for debugging / inspection
-        if (lista != null && !lista.isEmpty()) {
-            System.out.println("First estat: " + lista.get(0).getEstat());
-        }
+    
 
         return lista.stream()
                 .map(this::mapToDTO)
@@ -80,6 +77,7 @@ public class OrdinadorService {
         dto.setModel(o.getModel());
         dto.setType(o.getType());
         dto.setEstat(o.getEstat());
+        dto.setObservacions(o.getObservacions());
         return dto;
     }
 }

@@ -36,6 +36,13 @@ bin/
 *.yml
 !src/main/resources/application-example.properties
 
+# --- Base de Datos / Volcados ---
+# Evita subir volcados de datos reales y el script de inicialización de Docker
+database/
+*.sql
+*.sqlite
+*.db
+
 # --- Sistema y Logs ---
 *.log
 .DS_Store
