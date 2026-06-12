@@ -1,10 +1,10 @@
-package com.barcelonaturisme.inventory.infraestructure.persistance;
+package com.barcelonaturisme.inventory.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.barcelonaturisme.inventory.core.domain.Ordinador;
-import com.barcelonaturisme.inventory.core.domain.OrdinadorType;
+import com.barcelonaturisme.inventory.model.Ordinador;
+import com.barcelonaturisme.inventory.model.OrdinadorType;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.barcelonaturisme.inventory.core.domain;
+package com.barcelonaturisme.inventory.model;
 
 import jakarta.persistence.*; // Importa todas las etiquetas JPA (@Entity, @Table...)
 import lombok.Data; // Importa Lombok para los Getters/Setters

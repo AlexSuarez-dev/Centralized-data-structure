@@ -1,12 +1,12 @@
-package com.barcelonaturisme.inventory.features.usecases.importacio;
+package com.barcelonaturisme.inventory.service;
 
-import com.barcelonaturisme.inventory.core.domain.Entitat;
-import com.barcelonaturisme.inventory.core.domain.Ordinador;
-import com.barcelonaturisme.inventory.core.domain.OrdinadorType;
-import com.barcelonaturisme.inventory.core.domain.Pinpad;
-import com.barcelonaturisme.inventory.infraestructure.persistance.ActiuRepository;
-import com.barcelonaturisme.inventory.infraestructure.persistance.PinpadRepository;
-import com.barcelonaturisme.inventory.infraestructure.persistance.UsuariRepository;
+import com.barcelonaturisme.inventory.model.Entitat;
+import com.barcelonaturisme.inventory.model.Ordinador;
+import com.barcelonaturisme.inventory.model.OrdinadorType;
+import com.barcelonaturisme.inventory.model.Pinpad;
+import com.barcelonaturisme.inventory.repository.ActiuRepository;
+import com.barcelonaturisme.inventory.repository.PinpadRepository;
+import com.barcelonaturisme.inventory.repository.UsuariRepository;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;

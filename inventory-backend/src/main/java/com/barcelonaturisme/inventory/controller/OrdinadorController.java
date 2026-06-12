@@ -1,11 +1,12 @@
-package com.barcelonaturisme.inventory.features.usecases.gestions.ordinadors;
+package com.barcelonaturisme.inventory.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.barcelonaturisme.inventory.features.usecases.gestions.ordinadors.dto.OrdinadorDTO;
+import com.barcelonaturisme.inventory.dto.OrdinadorDTO;
+import com.barcelonaturisme.inventory.service.OrdinadorService;
 
 import java.util.List;
 
@@ -15,11 +16,11 @@ import java.util.List;
 public class OrdinadorController {
 
     private final OrdinadorService ordinadorService;
-    private final GetOrdinadors getOrdinadors;
 
     @GetMapping
     public ResponseEntity<List<OrdinadorDTO>> getActius(@RequestParam(required = false) String search) {
-        return ResponseEntity.ok(getOrdinadors.execute(search));
+        // Now points directly to the service
+        return ResponseEntity.ok(ordinadorService.getAll(search)); 
     }
 
     @PostMapping

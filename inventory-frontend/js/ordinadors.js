@@ -10,9 +10,10 @@ $(document).ready(function () {
         const obs = item.observacions || '-';
 
         let colorClase = '';
-        if (item.estat === 1) colorClase = 'text-success';
-        else if (item.estat === 2) colorClase = 'text-warning';
+        if (item.estat == 1) colorClase = 'text-success';
+        else if (item.estat == 2) colorClase = 'text-warning';
         else colorClase = 'text-danger';
+        
 
         return `
             <tr>

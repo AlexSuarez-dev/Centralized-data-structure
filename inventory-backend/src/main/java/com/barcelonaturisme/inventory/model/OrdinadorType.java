@@ -1,4 +1,4 @@
-package com.barcelonaturisme.inventory.core.domain;
+package com.barcelonaturisme.inventory.model;
 
 public enum OrdinadorType {
     PC,

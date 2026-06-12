@@ -1,9 +1,9 @@
-package com.barcelonaturisme.inventory.infraestructure.persistance;
+package com.barcelonaturisme.inventory.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.barcelonaturisme.inventory.core.domain.Pinpad;
+import com.barcelonaturisme.inventory.model.Pinpad;
 
 import java.util.Optional;
 

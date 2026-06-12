@@ -1,9 +1,11 @@
-package com.barcelonaturisme.inventory.features.usecases.importacio;
+package com.barcelonaturisme.inventory.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.barcelonaturisme.inventory.service.ExcelImportService;
 
 @RestController
 @RequestMapping("/api/import")

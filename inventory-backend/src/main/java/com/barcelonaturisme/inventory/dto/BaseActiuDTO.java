@@ -1,4 +1,4 @@
-package com.barcelonaturisme.inventory.core.dto;
+package com.barcelonaturisme.inventory.dto;
 
 import lombok.Data;
 

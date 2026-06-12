@@ -1,4 +1,4 @@
-package com.barcelonaturisme.inventory.infraestructure.configuration;
+package com.barcelonaturisme.inventory.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

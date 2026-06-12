@@ -1,7 +1,6 @@
-package com.barcelonaturisme.inventory.features.usecases.gestions.ordinadors.dto;
+package com.barcelonaturisme.inventory.dto;
 
-import com.barcelonaturisme.inventory.core.domain.OrdinadorType;
-import com.barcelonaturisme.inventory.core.dto.BaseActiuDTO;
+import com.barcelonaturisme.inventory.model.OrdinadorType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
