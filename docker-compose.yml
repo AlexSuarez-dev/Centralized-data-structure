@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: inventario-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Aquí mapeamos tu dump para que se ejecute al arrancar
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:alpine
+    container_name: inventario-frontend
+    ports:
+      - "80:80"
+    volumes:
+      # Asegúrate de que este path apunta a la carpeta donde tienes tu index.html
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - mysql-db
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

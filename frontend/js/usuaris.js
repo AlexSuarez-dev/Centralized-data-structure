@@ -1,7 +1,7 @@
 import { fetchAndRender } from './utils.js';
 
 $(document).ready(function () {
-    const API_URL = 'http://localhost:8080/api/v1/usuaris';
+    const API_URL = 'http://svharmonia:8080/api/v1/usuaris';
     const $tbody = $('#tabla-body');
     
     new bootstrap.Tooltip(document.getElementById('tabla-body'), {

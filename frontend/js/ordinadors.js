@@ -1,7 +1,7 @@
 import { fetchAndRender } from './utils.js';
 
 $(document).ready(function () {
-    const API_URL = 'http://localhost:8080/api/v1/ordinadors';
+    const API_URL = 'http://svharmonia:8080/api/v1/ordinadors';
     const $tbody = $('#tabla-body');
     // Inicializar Tooltips de Bootstrap 5 de forma delegada para contenido dinámico
     new bootstrap.Tooltip(document.getElementById('tabla-body'), {

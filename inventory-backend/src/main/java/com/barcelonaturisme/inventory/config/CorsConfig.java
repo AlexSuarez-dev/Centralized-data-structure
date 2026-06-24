@@ -15,14 +15,14 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**") // Aplica a todos los endpoints de tu API
                         .allowedOrigins(
-                            "http://localhost",       // Tu nuevo frontend en Docker (Nginx)
-                            "http://127.0.0.1",       // Alternativa de Docker
-                            "http://localhost:5500",  // Por si vuelves a usar Live Server
+                            "http://svharmonia",       
+                            "http://127.0.0.1",       
+                            "http://localhost:5500",  
                             "http://127.0.0.1:5500"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Verbos permitidos
-                        .allowedHeaders("*") // Permite cualquier cabecera
-                        .allowCredentials(true); // Permite enviar cookies o tokens si los tuvieras
+                        .allowedHeaders("*") 
+                        .allowCredentials(true); 
             }
         };
     }

@@ -5,6 +5,7 @@ build/
 *.jar
 *.war
 *.ear
+.env
 
 # --- Maven / Gradle wrapper ---
 .mvn/wrapper/maven-wrapper.jar
