@@ -206,7 +206,7 @@ public class ExcelImportService {
 
                 usuariRepository.findById(nombreUsuarioExcel).ifPresent(user -> {
                     // SOLO si existe en la BBDD, hacemos la vinculación
-                    user.setOrdinador(c);
+                    user.setActiu(c);
                     c.setUsuari(user);
                 });
                 // Si no entra en el ifPresent, el ordenador 'c' simplemente no tendrá usuario

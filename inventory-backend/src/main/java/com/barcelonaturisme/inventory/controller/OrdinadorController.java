@@ -30,6 +30,7 @@ public class OrdinadorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<OrdinadorDTO> update(@PathVariable Long id, @RequestBody OrdinadorDTO dto) {
+        System.out.println("Updating Ordinador with ID: " + id + " and data: " + dto);
         return ResponseEntity.ok(ordinadorService.update(id, dto));
     }
 

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,6 @@ public class OrdinadorService {
         } else {
             lista = ordinadorRepository.findAll();
         }
-    
 
         return lista.stream()
                 .map(this::mapToDTO)
@@ -44,6 +45,7 @@ public class OrdinadorService {
     public OrdinadorDTO update(Long id, OrdinadorDTO dto) {
         Ordinador entity = ordinadorRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        System.out.println("Found Ordinador entity: " + entity);
         updateEntityWithDto(entity, dto);
         return mapToDTO(ordinadorRepository.save(entity));
     }
@@ -63,6 +65,14 @@ public class OrdinadorService {
         entity.setType(dto.getType());
         entity.setEstat(dto.getEstat());
         entity.setObservacions(dto.getObservacions());
+
+        if (dto.getPurchaseDate() != null) {
+            LocalDate purchaseDate = LocalDate.parse(dto.getPurchaseDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            entity.setPurchaseDate(purchaseDate);
+        } else {
+            entity.setPurchaseDate(null);
+        }
+
     }
 
     private OrdinadorDTO mapToDTO(Ordinador o) {
@@ -78,6 +88,7 @@ public class OrdinadorService {
         dto.setType(o.getType());
         dto.setEstat(o.getEstat());
         dto.setObservacions(o.getObservacions());
+        dto.setPurchaseDate(o.getPurchaseDate() != null ? o.getPurchaseDate().toString() : null);
         return dto;
     }
 }

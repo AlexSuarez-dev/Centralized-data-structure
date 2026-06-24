@@ -34,6 +34,7 @@ $(document).ready(function () {
 
         return `
             <tr>
+                <input type="hidden" value="${item.id}">
                 <td>
                     <strong class="${colorClase}">${item.nom}</strong><br>
                     <small class="text-muted">${item.model}</small>
@@ -105,7 +106,10 @@ $(document).ready(function () {
     });
 
     $('#btn-guardar').on('click', function () {
+        console.log($('#ord-id').val());
+        
         const ordinadorData = {
+            id: $('#ord-id').val(),
             nom: $('#ord-nom').val(),
             serialNumber: $('#ord-serial').val(),
             type: $('#ord-type').val(),
@@ -118,10 +122,13 @@ $(document).ready(function () {
             purchaseDate: $('#ord-date').val()
         };
 
-        const id = $('#ord-id').val();
-        const ajaxType = id ? 'PUT' : 'POST';
-        const ajaxUrl = id ? `${API_URL}/${id}` : API_URL;
+        console.log(ordinadorData);
+        
+        const id = ordinadorData.id;
+        const ajaxType = id == '' ? 'POST' : 'PUT';
+        const ajaxUrl = id && id != '' ? `${API_URL}/${id}` : API_URL;
 
+        
         $.ajax({
             url: ajaxUrl,
             method: ajaxType,
@@ -130,7 +137,29 @@ $(document).ready(function () {
             success: function () {
                 $('#modalOrdinador').modal('hide');
                 fetchAndRender(API_URL, $tbody, crearFilaOrdinador);
-                alert('Guardado correctamente');
+                
+                // --- NUEVA ALERTA VISUAL DE ÉXITO ---
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Guardado!',
+                    text: 'El equipo se ha guardado correctamente.',
+                    toast: true,           // Lo convierte en una notificación pequeña
+                    position: 'top-end',   // Arriba a la derecha
+                    showConfirmButton: false,
+                    timer: 3000,           // Desaparece sola a los 3 segundos
+                    timerProgressBar: true
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar:', error);                
+                
+                // --- NUEVA ALERTA VISUAL DE ERROR ---
+                Swal.fire({
+                    icon: 'error',
+                    title: '¡Vaya!',
+                    text: 'Error al guardar el ordenador. Por favor, inténtelo de nuevo.',
+                    confirmButtonColor: '#0d6efd' // Color azul de Bootstrap
+                });
             }
         });
     });

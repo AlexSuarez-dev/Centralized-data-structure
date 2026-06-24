@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Inventario - Barcelona Turisme</title>
+    <title>Usuarios - Barcelona Turisme</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="index.css">
@@ -16,9 +16,9 @@
 
     <div class="container mt-5">
         <div class="d-flex justify-content-between mb-4">
-            <h1>Ordenadores</h1>
+            <h1>Usuarios</h1>
             <div>
-                <button id="btn-nuevo" class="btn btn-success me-2">+ Nuevo Ordenador</button>
+                <button id="btn-nuevo" class="btn btn-success me-2">+ Nuevo Usuario</button>
                 <button id="btn-actualizar" class="btn btn-primary">Actualizar Datos</button>
             </div>
         </div>
@@ -29,21 +29,21 @@
                     <div class="col-md-6">
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input type="text" id="inventorySearch" class="form-control"
-                                placeholder="Buscar por nombre o número de serie...">
+                            <input type="text" id="userSearch" class="form-control"
+                                placeholder="Buscar por nombre, usuario o equipo asignado...">
                         </div>
                     </div>
                 </div>
                 <table class="table table-hover">
                     <thead class="table-dark">
                         <tr>
-                            <th>Equipo / Modelo</th>
-                            <th>Tipo</th>
+                            <th>Usuario</th>
+                            <th>Teléfono</th>
+                            <th>Email / Depto</th>
+                            <th>Equipo Asignado</th>
                             <th>Nº Serie</th>
-                            <th>Ubicación</th>
-                            <th>Especificaciones</th>
-                            <th>Compra</th>
-                            <th>Notas</th>
+                            <th>Kensington</th>
+                            <th class="text-center">Notas</th>
                             <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -54,73 +54,67 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalOrdinador" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title" id="modalTitle">Nuevo Ordenador</h5>
+                    <h5 class="modal-title" id="modalTitle">Nuevo Usuario</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="form-ordinador">
-                        <input type="hidden" id="ord-id">
+                    <form id="form-usuario">
+                        <input type="hidden" id="usr-original-id">
+
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Nombre Equipo</label>
-                                <input type="text" class="form-control" id="ord-nom" required placeholder="Ej: C0123">
+                                <label class="form-label">Nombre Completo (ID)</label>
+                                <input type="text" class="form-control" id="usr-nom" required
+                                    placeholder="Ej: Maria López">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Número de Serie</label>
-                                <input type="text" class="form-control" id="ord-serial">
+                                <label class="form-label">Teléfono</label>
+                                <input type="number" class="form-control" id="usr-telefon" placeholder="Ej: 600123456">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label">Tipo</label>
-                                <select class="form-select" id="ord-type">
-                                    <option value="PC">PC</option>
-                                    <option value="Portàtil">Portàtil</option>
-                                </select>
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="usr-email"
+                                    placeholder="mlopez@bcnturisme.cat">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Modelo</label>
-                                <input type="text" class="form-control" id="ord-model">
+                                <label class="form-label">Departamento</label>
+                                <input type="text" class="form-control" id="usr-depto"
+                                    placeholder="Atención al cliente">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Ubicación</label>
-                                <input type="text" class="form-control" id="ord-ubicacio">
+                                <label class="form-label">Llave Kensington</label>
+                                <input type="text" class="form-control" id="usr-kensington" placeholder="Ej: KENS-001">
                             </div>
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label">RAM</label>
-                                <input type="text" class="form-control" id="ord-ram" placeholder="Ej: 16GB">
+                            <div class="col-md-8">
+                                <label class="form-label">Equipo Asignado (ID Activo)</label>
+                                <input type="number" class="form-control" id="usr-actiu-id"
+                                    placeholder="ID del ordenador (Ej: 1570)">
+                                <div class="form-text">Más adelante cambiaremos esto por un desplegable dinámico.</div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Disco (HDD/SSD)</label>
-                                <input type="text" class="form-control" id="ord-hdd" placeholder="Ej: 512GB SSD">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Sistema Operativo</label>
-                                <input type="text" class="form-control" id="ord-so" placeholder="Ej: Win 11">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
                                 <label class="form-label">Estado</label>
-                                <select class="form-select" id="ord-estat">
-                                    <option value="1">EN ÚS</option>
-                                    <option value="2">STOCK</option>
-                                    <option value="0">BAIXA</option>
+                                <select class="form-select" id="usr-estat">
+                                    <option value="1">ACTIVO</option>
+                                    <option value="0">BAJA</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha de Compra</label>
-                                <input type="date" class="form-control" id="ord-date">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Notas</label>
+                                <textarea class="form-control" id="usr-observacions" rows="2"></textarea>
                             </div>
                         </div>
                     </form>
@@ -136,7 +130,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="module" src="js/navbar.js"></script>
-    <script type="module" src="js/ordinadors.js"></script>
+    <script type="module" src="js/usuarios.js"></script>
 
 </body>
 

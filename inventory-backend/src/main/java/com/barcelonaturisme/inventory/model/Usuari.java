@@ -15,6 +15,6 @@ public class Usuari {
     private Integer telefon;
 
     @OneToOne
-    @JoinColumn(name = "id_actiu", referencedColumnName = "id")
-    private Ordinador ordinador; // Relación directa con el PC/Portatil
+    @JoinColumn(name = "id_actiu") 
+    private Actiu actiu; 
 }

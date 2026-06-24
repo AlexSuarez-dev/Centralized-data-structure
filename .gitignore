@@ -1,4 +1,4 @@
-# --- Carpeta de compilación y binarios ---
+# --- Build folder and binaries ---
 target/
 build/
 *.class
@@ -29,21 +29,27 @@ bin/
 /nbdist/
 /.nb-gradle/
 
-# --- Configuración Sensible (CRÍTICO) ---
-# Aquí es donde ocultas tus contraseñas de DB y API Keys 
+# --- Sensitive Configuration (CRITICAL) ---
 .env
 *.properties
 *.yml
 !src/main/resources/application-example.properties
 
-# --- Base de Datos / Volcados ---
-# Evita subir volcados de datos reales y el script de inicialización de Docker
+# Critical exceptions so Git tracks infrastructure
+!docker-compose.yml
+!Dockerfile
+
+# --- Local Docker Data ---
+docker-data/
+.docker/
+
+# --- Database / Dumps ---
 database/
 *.sql
 *.sqlite
 *.db
 
-# --- Sistema y Logs ---
+# --- System and Logs ---
 *.log
 .DS_Store
 Thumbs.db

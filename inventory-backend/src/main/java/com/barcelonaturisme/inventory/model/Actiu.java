@@ -23,9 +23,12 @@ public class Actiu {
     private String model;
     private String ubicacio;
 
-    @Column(name = "fechaCompra")
+    @Column(name = "fecha_compra")
     private LocalDate purchaseDate;
     
     private String observacions;
     private Integer estat; // true = activo, false = inactivo
+
+    @OneToOne(mappedBy = "actiu", cascade = CascadeType.ALL)
+    private Usuari usuari;
 }
