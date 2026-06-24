@@ -1,4 +1,4 @@
-package com.barcelonaturisme.inventory.config; // Ajusta el package según tu estructura actual
+package com.barcelonaturisme.inventory.config; // Adjust the package according to your current structure
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,14 +13,14 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**") // Aplica a todos los endpoints de tu API
+                registry.addMapping("/api/**") // Applies to all endpoints of your API
                         .allowedOrigins(
                             "http://svharmonia",       
                             "http://127.0.0.1",       
                             "http://localhost:5500",  
                             "http://127.0.0.1:5500"
                         )
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Verbos permitidos
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed methods
                         .allowedHeaders("*") 
                         .allowCredentials(true); 
             }

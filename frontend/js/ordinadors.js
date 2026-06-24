@@ -1,20 +1,20 @@
 import { fetchAndRender } from './utils.js';
 
 $(document).ready(function () {
-    const API_URL = 'http://svharmonia:8080/api/v1/ordinadors';
+    const API_URL = '/api/v1/ordinadors';
     const $tbody = $('#tabla-body');
-    // Inicializar Tooltips de Bootstrap 5 de forma delegada para contenido dinámico
+    // Initialize Bootstrap 5 tooltips in a delegated way for dynamic content
     new bootstrap.Tooltip(document.getElementById('tabla-body'), {
         selector: '[data-bs-toggle="tooltip"]'
     });
 
-    // --- 1. Lógica de renderizado específico para Ordenadores ---
+    // --- 1. Renderer logic specific to computers ---
     function crearFilaOrdinador(item) {
         const fecha = item.purchaseDate || 'Sin fecha';
-        // --- Lógica de las notas ---
+        // --- Notes logic ---
         let obsHtml = '<span class="text-muted">-</span>';
         if (item.observacions && item.observacions.trim() !== '') {
-            // Si hay notas, creamos un icono con el Tooltip de Bootstrap
+            // If there are notes, create an icon with a Bootstrap tooltip
             obsHtml = `
             <i class="bi bi-info-circle-fill text-primary" 
                data-bs-toggle="tooltip" 
@@ -29,7 +29,7 @@ $(document).ready(function () {
         else if (item.estat == 2) colorClase = 'text-warning';
         else colorClase = 'text-danger';
 
-        // Empaquetamos todo el objeto en un atributo HTML de forma segura
+        // Package the whole object into an HTML attribute safely
         const itemData = encodeURIComponent(JSON.stringify(item));
 
         return `
@@ -60,10 +60,10 @@ $(document).ready(function () {
 
 
     $tbody.on('click', '.btn-editar', function () {
-        // 1. Extraer y desencriptar los datos del botón
+        // 1. Extract and decode the button data
         const item = JSON.parse(decodeURIComponent($(this).data('item')));
 
-        // 2. Rellenar todos los campos del formulario
+        // 2. Fill all form fields
         $('#ord-id').val(item.id);
         $('#ord-nom').val(item.nom);
         $('#ord-serial').val(item.serialNumber);
@@ -76,24 +76,24 @@ $(document).ready(function () {
         $('#ord-estat').val(item.estat);
         $('#ord-date').val(item.purchaseDate);
 
-        // 3. Cambiar el título del Modal para que el usuario sepa qué hace
+        // 3. Change the modal title so the user knows what it does
         $('#modalTitle').text('Editar Equipo: ' + item.nom);
 
-        // 4. Mostrar el Modal
+        // 4. Show the modal
         $('#modalOrdinador').modal('show');
     });
 
-    // --- 2. Evento de Búsqueda con DEBOUNCE ---
+    // --- 2. Search event with debounce ---
     let timer;
     $('#inventorySearch').change(function () {
         const query = $(this).val();
         clearTimeout(timer);
         timer = setTimeout(() => {
             fetchAndRender(API_URL, $tbody, crearFilaOrdinador, query);
-        }, 300); // Espera 300ms antes de llamar al backend
+        }, 300); // Wait 300ms before calling the backend
     });
 
-    // --- 3. Resto de funcionalidades (Guardar/Nuevo) ---
+    // --- 3. Remaining functionality (Save/New) ---
     $('#btn-nuevo').on('click', function () {
         $('#form-ordinador')[0].reset();
         $('#ord-id').val('');
@@ -101,7 +101,7 @@ $(document).ready(function () {
     });
 
     $('#btn-actualizar').click(function () {
-        // Carga inicial
+        // Initial load
         fetchAndRender(API_URL, $tbody, crearFilaOrdinador);
     });
 
@@ -138,32 +138,32 @@ $(document).ready(function () {
                 $('#modalOrdinador').modal('hide');
                 fetchAndRender(API_URL, $tbody, crearFilaOrdinador);
                 
-                // --- NUEVA ALERTA VISUAL DE ÉXITO ---
+                // --- NEW SUCCESS VISUAL ALERT ---
                 Swal.fire({
                     icon: 'success',
                     title: '¡Guardado!',
                     text: 'El equipo se ha guardado correctamente.',
-                    toast: true,           // Lo convierte en una notificación pequeña
-                    position: 'top-end',   // Arriba a la derecha
+                    toast: true,           // Turns it into a small notification
+                    position: 'top-end',   // Top-right position
                     showConfirmButton: false,
-                    timer: 3000,           // Desaparece sola a los 3 segundos
+                    timer: 3000,           // Disappears after 3 seconds
                     timerProgressBar: true
                 });
             },
             error: function (xhr, status, error) {
                 console.error('Error al guardar:', error);                
                 
-                // --- NUEVA ALERTA VISUAL DE ERROR ---
+                // --- NEW ERROR VISUAL ALERT ---
                 Swal.fire({
                     icon: 'error',
                     title: '¡Vaya!',
                     text: 'Error al guardar el ordenador. Por favor, inténtelo de nuevo.',
-                    confirmButtonColor: '#0d6efd' // Color azul de Bootstrap
+                    confirmButtonColor: '#0d6efd' // Bootstrap blue color
                 });
             }
         });
     });
 
-    // Carga inicial
+    // Initial load
     fetchAndRender(API_URL, $tbody, crearFilaOrdinador);
 });

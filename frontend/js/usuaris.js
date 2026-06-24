@@ -1,16 +1,16 @@
 import { fetchAndRender } from './utils.js';
 
 $(document).ready(function () {
-    const API_URL = 'http://svharmonia:8080/api/v1/usuaris';
+    const API_URL = '/api/v1/usuaris';
     const $tbody = $('#tabla-body');
-    
+
     new bootstrap.Tooltip(document.getElementById('tabla-body'), {
         selector: '[data-bs-toggle="tooltip"]'
     });
 
-    // --- 1. Lógica de renderizado específico para Usuarios ---
+    // --- 1. Rendering logic specific to Users ---
     function crearFilaUsuario(item) {
-        // Lógica de las notas
+        // Notes logic
         let obsHtml = '<span class="text-muted">-</span>';
         if (item.observacions && item.observacions.trim() !== '') {
             obsHtml = `
@@ -22,11 +22,11 @@ $(document).ready(function () {
             </i>`;
         }
 
-        // Extraer datos del equipo asignado (si tiene)
+        // Extract assigned equipment data (if any)
         const equipoNom = item.actiu ? item.actiu.nom : '<span class="text-muted">Sin asignar</span>';
         const equipoSerie = item.actiu && item.actiu.serialNumber ? item.actiu.serialNumber : '-';
-        
-        // Datos que aún no están en BBDD (simulados por ahora)
+
+        // Data not yet in DB (simulated for now)
         const email = item.email || '-';
         const depto = item.departament || '-';
         const kensington = item.kensington || '<span class="text-muted">No asignada</span>';
@@ -56,14 +56,14 @@ $(document).ready(function () {
             </tr>`;
     }
 
-    // --- 2. Evento Editar ---
+    // --- 2. Edit event ---
     $tbody.on('click', '.btn-editar', function () {
         const item = JSON.parse(decodeURIComponent($(this).data('item')));
 
-        // Como el "nom" es la Primary Key, lo guardamos en el hidden para el PUT
+        // Since "nom" is the Primary Key, save it in the hidden field for PUT
         $('#usr-original-id').val(item.nom);
-        
-        // Rellenar campos
+
+        // Fill fields
         $('#usr-nom').val(item.nom);
         $('#usr-telefon').val(item.telefon);
         $('#usr-email').val(item.email);
@@ -71,24 +71,24 @@ $(document).ready(function () {
         $('#usr-kensington').val(item.kensington);
         $('#usr-observacions').val(item.observacions);
         $('#usr-estat').val(item.estat || 1);
-        
-        if(item.actiu) {
+
+        if (item.actiu) {
             $('#usr-actiu-id').val(item.actiu.id);
         } else {
             $('#usr-actiu-id').val('');
         }
 
-        // Si estamos editando, NO deberíamos poder cambiar el ID (Nombre)
+        // If editing, we should NOT be able to change the ID (Name)
         $('#usr-nom').prop('readonly', true);
         $('#modalTitle').text('Editar Usuario: ' + item.nom);
         $('#modalUsuario').modal('show');
     });
 
-    // --- 3. Evento Nuevo Usuario ---
+    // --- 3. New User event ---
     $('#btn-nuevo').on('click', function () {
         $('#form-usuario')[0].reset();
         $('#usr-original-id').val('');
-        $('#usr-nom').prop('readonly', false); // Aquí sí podemos escribir el nombre
+        $('#usr-nom').prop('readonly', false); // Here we can type the name
         $('#modalTitle').text('Nuevo Usuario');
         $('#modalUsuario').modal('show');
     });
@@ -97,11 +97,11 @@ $(document).ready(function () {
         fetchAndRender(API_URL, $tbody, crearFilaUsuario);
     });
 
-    // --- 4. Evento Guardar (Debes tener tu DTO preparado en Java para recibir esto) ---
+    // --- 4. Save event (You need your DTO ready in Java to receive this) ---
     $('#btn-guardar').on('click', function () {
         const originalId = $('#usr-original-id').val();
-        
-        // Construimos el objeto para enviar al backend
+
+        // Build the object to send to the backend
         const usuarioData = {
             nom: $('#usr-nom').val(),
             telefon: $('#usr-telefon').val() ? parseInt($('#usr-telefon').val()) : null,
@@ -110,12 +110,12 @@ $(document).ready(function () {
             kensington: $('#usr-kensington').val(),
             observacions: $('#usr-observacions').val(),
             estat: parseInt($('#usr-estat').val()),
-            // Enviaremos solo el ID del activo para que el backend lo asocie
-            actiuId: $('#usr-actiu-id').val() ? parseInt($('#usr-actiu-id').val()) : null 
+            // We will send only the asset ID so the backend can associate it
+            actiuId: $('#usr-actiu-id').val() ? parseInt($('#usr-actiu-id').val()) : null
         };
 
         const ajaxType = originalId === '' ? 'POST' : 'PUT';
-        // Si es PUT, la URL necesita el ID (el nombre original)
+        // If it is PUT, the URL needs the ID (the original name)
         const ajaxUrl = originalId !== '' ? `${API_URL}/${encodeURIComponent(originalId)}` : API_URL;
 
         $.ajax({
@@ -126,7 +126,7 @@ $(document).ready(function () {
             success: function () {
                 $('#modalUsuario').modal('hide');
                 fetchAndRender(API_URL, $tbody, crearFilaUsuario);
-                
+
                 Swal.fire({
                     icon: 'success',
                     title: '¡Guardado!',
@@ -139,7 +139,7 @@ $(document).ready(function () {
                 });
             },
             error: function (xhr, status, error) {
-                console.error('Error al guardar:', error);                
+                console.error('Error al guardar:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error de guardado',
@@ -150,7 +150,7 @@ $(document).ready(function () {
         });
     });
 
-    // Búsqueda con Debounce
+    // Search with debounce
     let timer;
     $('#userSearch').change(function () {
         const query = $(this).val();
@@ -160,6 +160,6 @@ $(document).ready(function () {
         }, 300);
     });
 
-    // Carga inicial
+    // Initial load
     fetchAndRender(API_URL, $tbody, crearFilaUsuario);
 });
