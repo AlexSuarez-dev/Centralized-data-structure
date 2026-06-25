@@ -66,7 +66,7 @@ public class OrdinadorService {
         entity.setEstat(dto.getEstat());
         entity.setObservacions(dto.getObservacions());
 
-        if (dto.getPurchaseDate() != null) {
+        if (dto.getPurchaseDate() != null && !dto.getPurchaseDate().isEmpty()) {
             LocalDate purchaseDate = LocalDate.parse(dto.getPurchaseDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             entity.setPurchaseDate(purchaseDate);
         } else {

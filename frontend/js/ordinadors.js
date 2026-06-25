@@ -122,7 +122,9 @@ $(document).ready(function () {
             purchaseDate: $('#ord-date').val()
         };
 
-        console.log(ordinadorData);
+        if (ordinadorData.purchaseDate === '') {
+            ordinadorData.purchaseDate = null; // Set to null if empty
+        }
         
         const id = ordinadorData.id;
         const ajaxType = id == '' ? 'POST' : 'PUT';

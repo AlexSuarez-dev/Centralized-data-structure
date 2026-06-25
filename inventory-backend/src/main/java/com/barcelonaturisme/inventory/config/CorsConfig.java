@@ -15,8 +15,7 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**") // Applies to all endpoints of your API
                         .allowedOrigins(
-                            "http://svharmonia",       
-                            "http://127.0.0.1",       
+                            "http://svdocker:5500",                                   
                             "http://localhost:5500",  
                             "http://127.0.0.1:5500"
                         )
