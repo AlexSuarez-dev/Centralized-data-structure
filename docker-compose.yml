@@ -32,6 +32,7 @@ services:
       - mysql-db
     networks:
       - inventario-net
+      - global-router 
     restart: unless-stopped
 
   # 3. Frontend (Nginx serving static files)
