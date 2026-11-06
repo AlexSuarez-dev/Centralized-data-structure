@@ -15,4 +15,7 @@ public interface PinpadRepository extends JpaRepository<Pinpad, Long> {
     
     // Buscar por número de comercio
     Optional<Pinpad> findByNumComercio(String numComercio);
+
+    // Pinpad conectado a un ordenador (pinpad.id_ordinador es UNIQUE)
+    Optional<Pinpad> findByOrdenadorConectadoId(Long ordinadorId);
 }

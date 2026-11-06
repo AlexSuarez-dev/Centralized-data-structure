@@ -30,7 +30,7 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-search"></i></span>
                             <input type="text" id="userSearch" class="form-control"
-                                placeholder="Buscar por nombre, usuario o equipo asignado...">
+                                placeholder="Buscar por login o email...">
                         </div>
                     </div>
                 </div>
@@ -38,7 +38,6 @@
                     <thead class="table-dark">
                         <tr>
                             <th>Usuario</th>
-                            <th>Teléfono</th>
                             <th>Email / Depto</th>
                             <th>Equipo Asignado</th>
                             <th>Nº Serie</th>
@@ -67,14 +66,16 @@
                         <input type="hidden" id="usr-original-id">
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nombre Completo (ID)</label>
+                            <div class="col-md-8">
+                                <label class="form-label">Usuario (login)</label>
                                 <input type="text" class="form-control" id="usr-nom" required
-                                    placeholder="Ej: Maria López">
+                                    placeholder="Ej: mlopez">
+                                <div class="form-text">Inicial del nombre + apellido. No se puede cambiar después.</div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Teléfono</label>
-                                <input type="number" class="form-control" id="usr-telefon" placeholder="Ej: 600123456">
+                            <div class="col-md-4">
+                                <label class="form-label">Estado</label>
+                                <!-- Opciones generadas desde ESTATS_USUARI (js/utils.js) -->
+                                <select class="form-select" id="usr-estat"></select>
                             </div>
                         </div>
 
@@ -96,18 +97,11 @@
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-8">
+                            <div class="col-12">
                                 <label class="form-label">Equipo Asignado (ID Activo)</label>
                                 <input type="number" class="form-control" id="usr-actiu-id"
                                     placeholder="ID del ordenador (Ej: 1570)">
-                                <div class="form-text">Más adelante cambiaremos esto por un desplegable dinámico.</div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Estado</label>
-                                <select class="form-select" id="usr-estat">
-                                    <option value="1">ACTIVO</option>
-                                    <option value="0">BAJA</option>
-                                </select>
+                                <div class="form-text">Vacío = sin equipo. Más adelante cambiaremos esto por un desplegable dinámico.</div>
                             </div>
                         </div>
 

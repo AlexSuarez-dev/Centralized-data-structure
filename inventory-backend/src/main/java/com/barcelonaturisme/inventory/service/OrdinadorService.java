@@ -1,11 +1,16 @@
 package com.barcelonaturisme.inventory.service;
 
 import com.barcelonaturisme.inventory.dto.OrdinadorDTO;
+import com.barcelonaturisme.inventory.model.EstatActiu;
 import com.barcelonaturisme.inventory.model.Ordinador;
 import com.barcelonaturisme.inventory.repository.ComputerRepository;
+import com.barcelonaturisme.inventory.repository.PinpadRepository;
+import com.barcelonaturisme.inventory.repository.UsuariRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
@@ -14,11 +19,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrdinadorService {
 
     private final ComputerRepository ordinadorRepository;
+    private final UsuariRepository usuariRepository;
+    private final PinpadRepository pinpadRepository;
 
     // Renamed from 'execute' to 'getAll' for standard REST naming
     public List<OrdinadorDTO> getAll(String search) {
@@ -43,15 +51,33 @@ public class OrdinadorService {
     }
 
     public OrdinadorDTO update(Long id, OrdinadorDTO dto) {
-        Ordinador entity = ordinadorRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        System.out.println("Found Ordinador entity: " + entity);
+        Ordinador entity = findOrThrow(id);
+        log.debug("Updating Ordinador {} with data {}", id, dto);
         updateEntityWithDto(entity, dto);
         return mapToDTO(ordinadorRepository.save(entity));
     }
 
+    // Antes de borrar se desvinculan la persona y el pinpad: la persona se conserva sin equipo
+    // y el pinpad queda sin PC (si no, la FK de pinpad impide el borrado).
+    @Transactional
     public void delete(Long id) {
-        ordinadorRepository.deleteById(id);
+        Ordinador entity = findOrThrow(id);
+
+        usuariRepository.findByActiuId(id).ifPresent(usuari -> {
+            usuari.setActiu(null);
+            usuariRepository.save(usuari);
+        });
+        pinpadRepository.findByOrdenadorConectadoId(id).ifPresent(pinpad -> {
+            pinpad.setOrdenadorConectado(null);
+            pinpadRepository.save(pinpad);
+        });
+
+        ordinadorRepository.delete(entity);
+    }
+
+    private Ordinador findOrThrow(Long id) {
+        return ordinadorRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el ordenador " + id));
     }
 
     private void updateEntityWithDto(Ordinador entity, OrdinadorDTO dto) {
@@ -63,7 +89,7 @@ public class OrdinadorService {
         entity.setSo(dto.getSo());
         entity.setHdd(dto.getHdd());
         entity.setType(dto.getType());
-        entity.setEstat(dto.getEstat());
+        entity.setEstat(dto.getEstat() != null ? dto.getEstat() : EstatActiu.EN_US);
         entity.setObservacions(dto.getObservacions());
 
         if (dto.getPurchaseDate() != null && !dto.getPurchaseDate().isEmpty()) {

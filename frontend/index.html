@@ -112,15 +112,19 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Estado</label>
-                                <select class="form-select" id="ord-estat">
-                                    <option value="1">EN ÚS</option>
-                                    <option value="2">STOCK</option>
-                                    <option value="0">BAIXA</option>
-                                </select>
+                                <!-- Opciones generadas desde ESTATS_ACTIU (js/utils.js) -->
+                                <select class="form-select" id="ord-estat"></select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Fecha de Compra</label>
                                 <input type="date" class="form-control" id="ord-date">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Notas</label>
+                                <textarea class="form-control" id="ord-observacions" rows="2"></textarea>
                             </div>
                         </div>
                     </form>

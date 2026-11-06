@@ -12,12 +12,17 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Only run the first time the mysql_data volume is created, in alphabetical order.
+      # On an existing database, apply new migrations by hand (see README).
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./database/migrations/001_estat_enum_usuaris.sql:/docker-entrypoint-initdb.d/02-001_estat_enum_usuaris.sql
+      - ./database/migrations/002_correccio_portatils.sql:/docker-entrypoint-initdb.d/03-002_correccio_portatils.sql
+      - ./database/migrations/004_estat_cpus.sql:/docker-entrypoint-initdb.d/05-004_estat_cpus.sql
     networks:
       - inventario-net
     restart: unless-stopped
 
-  # 2. Backend (Spring Boot)
+  # 2. Backend (Spring Boot) - only reachable through the frontend's /api/ proxy
   backend:
     build:
       context: ./inventory-backend
@@ -32,10 +37,9 @@ services:
       - mysql-db
     networks:
       - inventario-net
-      - global-router 
     restart: unless-stopped
 
-  # 3. Frontend (Nginx serving static files)
+  # 3. Frontend (Nginx serving static files + proxy /api/ to the backend)
   frontend:
     image: nginx:alpine
     container_name: inventario-frontend
@@ -46,14 +50,14 @@ services:
       - backend
     networks:
       - inventario-net
-      - global-router 
+      - global-router
     restart: unless-stopped
 
 networks:
   inventario-net:
     driver: bridge
   global-router:
-    external: true 
+    external: true
 
 volumes:
   mysql_data:

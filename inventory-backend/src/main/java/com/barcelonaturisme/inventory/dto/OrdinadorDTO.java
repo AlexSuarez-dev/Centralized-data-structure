@@ -12,7 +12,6 @@ public class OrdinadorDTO extends BaseActiuDTO {
     private String so;
     private String hdd;
     private OrdinadorType type; // PC o Portàtil
-    private Integer estat;
     private String observacions;
-    private String purchaseDate; // String para facilitar el manejo en el frontend
+    private String purchaseDate; // String (yyyy-MM-dd) para facilitar el manejo en el frontend
 }

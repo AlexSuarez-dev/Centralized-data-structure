@@ -1,12 +1,14 @@
-import { fetchAndRender } from './utils.js';
+import { API_BASE, ESTATS_ACTIU, escapeHtml, errorMessage, fetchAndRender, fillEstatSelect } from './utils.js';
 
 $(document).ready(function () {
-    const API_URL = '/api/v1/ordinadors';
+    const API_URL = `${API_BASE}/ordinadors`;
     const $tbody = $('#tabla-body');
     // Initialize Bootstrap 5 tooltips in a delegated way for dynamic content
     new bootstrap.Tooltip(document.getElementById('tabla-body'), {
         selector: '[data-bs-toggle="tooltip"]'
     });
+
+    fillEstatSelect($('#ord-estat'), ESTATS_ACTIU);
 
     // --- 1. Renderer logic specific to computers ---
     function crearFilaOrdinador(item) {
@@ -16,39 +18,38 @@ $(document).ready(function () {
         if (item.observacions && item.observacions.trim() !== '') {
             // If there are notes, create an icon with a Bootstrap tooltip
             obsHtml = `
-            <i class="bi bi-info-circle-fill text-primary" 
-               data-bs-toggle="tooltip" 
-               data-bs-placement="top" 
-               title="${item.observacions}" 
+            <i class="bi bi-info-circle-fill text-primary"
+               data-bs-toggle="tooltip"
+               data-bs-placement="top"
+               title="${escapeHtml(item.observacions)}"
                style="cursor: help; font-size: 1.1rem;">
             </i>`;
         }
 
-        let colorClase = '';
-        if (item.estat == 1) colorClase = 'text-success';
-        else if (item.estat == 2) colorClase = 'text-warning';
-        else colorClase = 'text-danger';
+        const estat = ESTATS_ACTIU[item.estat] || { label: item.estat || '?', badge: 'bg-light text-dark', text: '' };
 
         // Package the whole object into an HTML attribute safely
         const itemData = encodeURIComponent(JSON.stringify(item));
 
         return `
             <tr>
-                <input type="hidden" value="${item.id}">
                 <td>
-                    <strong class="${colorClase}">${item.nom}</strong><br>
-                    <small class="text-muted">${item.model}</small>
+                    <strong class="${estat.text}">${escapeHtml(item.nom)}</strong><br>
+                    <small class="text-muted">${escapeHtml(item.model)}</small>
                 </td>
-                <td><span class="badge bg-success">${item.type}</span></td>
-                <td><small>${item.serialNumber}</small></td>
-                <td>${item.ubicacio}</td>
+                <td>
+                    <span class="badge bg-light text-dark border">${escapeHtml(item.type)}</span>
+                    <span class="badge ${estat.badge}">${estat.label}</span>
+                </td>
+                <td><small>${escapeHtml(item.serialNumber)}</small></td>
+                <td>${escapeHtml(item.ubicacio)}</td>
                 <td>
                     <div style="font-size: 0.85rem;">
-                        <strong>SO:</strong> ${item.so || 'N/A'}<br>
-                        <strong>RAM:</strong> ${item.ram || 'N/A'} | <strong>HDD:</strong> ${item.hdd || 'N/A'}
+                        <strong>SO:</strong> ${escapeHtml(item.so || 'N/A')}<br>
+                        <strong>RAM:</strong> ${escapeHtml(item.ram || 'N/A')} | <strong>HDD:</strong> ${escapeHtml(item.hdd || 'N/A')}
                     </div>
                 </td>
-                <td><small>${fecha}</small></td>
+                <td><small>${escapeHtml(fecha)}</small></td>
                 <td class="text-center">${obsHtml}</td>
                 <td class="text-center">
                     <button class="btn btn-sm btn-outline-primary btn-editar" data-item="${itemData}">
@@ -75,6 +76,7 @@ $(document).ready(function () {
         $('#ord-so').val(item.so);
         $('#ord-estat').val(item.estat);
         $('#ord-date').val(item.purchaseDate);
+        $('#ord-observacions').val(item.observacions);
 
         // 3. Change the modal title so the user knows what it does
         $('#modalTitle').text('Editar Equipo: ' + item.nom);
@@ -83,9 +85,9 @@ $(document).ready(function () {
         $('#modalOrdinador').modal('show');
     });
 
-    // --- 2. Search event with debounce ---
+    // --- 2. Search event with debounce (fires while typing) ---
     let timer;
-    $('#inventorySearch').change(function () {
+    $('#inventorySearch').on('input', function () {
         const query = $(this).val();
         clearTimeout(timer);
         timer = setTimeout(() => {
@@ -97,17 +99,15 @@ $(document).ready(function () {
     $('#btn-nuevo').on('click', function () {
         $('#form-ordinador')[0].reset();
         $('#ord-id').val('');
+        $('#modalTitle').text('Nuevo Ordenador');
         $('#modalOrdinador').modal('show');
     });
 
     $('#btn-actualizar').click(function () {
-        // Initial load
-        fetchAndRender(API_URL, $tbody, crearFilaOrdinador);
+        fetchAndRender(API_URL, $tbody, crearFilaOrdinador, $('#inventorySearch').val());
     });
 
     $('#btn-guardar').on('click', function () {
-        console.log($('#ord-id').val());
-        
         const ordinadorData = {
             id: $('#ord-id').val(),
             nom: $('#ord-nom').val(),
@@ -118,19 +118,17 @@ $(document).ready(function () {
             ram: $('#ord-ram').val(),
             hdd: $('#ord-hdd').val(),
             so: $('#ord-so').val(),
-            estat: parseInt($('#ord-estat').val()),
-            purchaseDate: $('#ord-date').val()
+            estat: $('#ord-estat').val(),
+            purchaseDate: $('#ord-date').val() || null, // Set to null if empty
+            // PUT replaces every field: if notes were not sent, they would be wiped
+            observacions: $('#ord-observacions').val()
         };
 
-        if (ordinadorData.purchaseDate === '') {
-            ordinadorData.purchaseDate = null; // Set to null if empty
-        }
-        
         const id = ordinadorData.id;
         const ajaxType = id == '' ? 'POST' : 'PUT';
         const ajaxUrl = id && id != '' ? `${API_URL}/${id}` : API_URL;
 
-        
+
         $.ajax({
             url: ajaxUrl,
             method: ajaxType,
@@ -138,9 +136,8 @@ $(document).ready(function () {
             data: JSON.stringify(ordinadorData),
             success: function () {
                 $('#modalOrdinador').modal('hide');
-                fetchAndRender(API_URL, $tbody, crearFilaOrdinador);
-                
-                // --- NEW SUCCESS VISUAL ALERT ---
+                fetchAndRender(API_URL, $tbody, crearFilaOrdinador, $('#inventorySearch').val());
+
                 Swal.fire({
                     icon: 'success',
                     title: '¡Guardado!',
@@ -153,13 +150,12 @@ $(document).ready(function () {
                 });
             },
             error: function (xhr, status, error) {
-                console.error('Error al guardar:', error);                
-                
-                // --- NEW ERROR VISUAL ALERT ---
+                console.error('Error al guardar:', error);
+
                 Swal.fire({
                     icon: 'error',
                     title: '¡Vaya!',
-                    text: 'Error al guardar el ordenador. Por favor, inténtelo de nuevo.',
+                    text: errorMessage(xhr, 'Error al guardar el ordenador. Por favor, inténtelo de nuevo.'),
                     confirmButtonColor: '#0d6efd' // Bootstrap blue color
                 });
             }

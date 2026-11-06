@@ -31,10 +31,13 @@ bin/
 /.nb-gradle/
 
 # --- Sensitive Configuration (CRITICAL) ---
+# application.properties is tracked: it must only contain ${ENV_VAR} placeholders, never secrets.
+# Local credentials go in application-local.properties (ignored).
 .env
 *.properties
 *.yml
-!src/main/resources/application-example.properties
+!inventory-backend/src/main/resources/application.properties
+!inventory-backend/.mvn/wrapper/maven-wrapper.properties
 
 # Critical exceptions so Git tracks infrastructure
 !docker-compose.yml
@@ -44,9 +47,21 @@ bin/
 docker-data/
 .docker/
 
+# --- Python ---
+__pycache__/
+*.pyc
+
+# --- Excel originales y salidas del script de análisis (datos reales) ---
+data/
+*_revision.xlsx
+*_perfiles.json
+
 # --- Database / Dumps ---
-database/
+# init.sql is a real data dump: never commit it. Schema migrations are tracked.
+database/*
+!database/migrations/
 *.sql
+!database/migrations/*.sql
 *.sqlite
 *.db
 

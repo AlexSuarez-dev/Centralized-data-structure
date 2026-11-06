@@ -1,17 +1,22 @@
 package com.barcelonaturisme.inventory.service;
 
 import com.barcelonaturisme.inventory.model.Entitat;
+import com.barcelonaturisme.inventory.model.EstatActiu;
 import com.barcelonaturisme.inventory.model.Ordinador;
 import com.barcelonaturisme.inventory.model.OrdinadorType;
 import com.barcelonaturisme.inventory.model.Pinpad;
+import com.barcelonaturisme.inventory.model.Usuari;
 import com.barcelonaturisme.inventory.repository.ActiuRepository;
+import com.barcelonaturisme.inventory.repository.ComputerRepository;
 import com.barcelonaturisme.inventory.repository.PinpadRepository;
 import com.barcelonaturisme.inventory.repository.UsuariRepository;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -23,19 +28,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ExcelImportService {
 
-    @Autowired
-    private ActiuRepository actiuRepository;
+    private final ActiuRepository actiuRepository;
+    private final ComputerRepository computerRepository;
+    private final UsuariRepository usuariRepository;
+    private final PinpadRepository pinpadRepository;
 
-    @Autowired
-    private UsuariRepository usuariRepository;
-
-    @Autowired
-    private PinpadRepository pinpadRepository;
-
+    // Todo o nada: si una hoja falla, no se queda la importación a medias.
+    @Transactional
     public void importInventory(MultipartFile file) throws IOException {
         try (InputStream inputStream = file.getInputStream();
                 Workbook workbook = new XSSFWorkbook(inputStream)) {
@@ -52,6 +58,10 @@ public class ExcelImportService {
             if (sheetLaptop != null) {
                 List<Ordinador> laptops = processLaptopSheet(sheetLaptop);
                 actiuRepository.saveAll(laptops);
+
+                // La FK usuari.id_actiu es de Usuari: la asignación se guarda desde ahí (Actiu no hace cascade).
+                List<Usuari> assignats = laptops.stream().map(Ordinador::getUsuari).filter(Objects::nonNull).toList();
+                usuariRepository.saveAll(assignats);
             }
 
             // 3. Procesar PINPADS (Hoja "Pinpads" o el nombre que tenga)
@@ -97,7 +107,10 @@ public class ExcelImportService {
             // Campos Básicos
             p.setSerialNumber(serial);
             p.setModel(getCellValue(row.getCell(colModelo)));
-            p.setNom(getCellValue(row.getCell(colUbicacio))); // Ubicación
+            // nom: de momento también la ubicación, hasta definir un identificador propio de pinpad
+            String ubicacio = getCellValue(row.getCell(colUbicacio));
+            p.setUbicacio(ubicacio);
+            p.setNom(ubicacio);
             p.setNumComercio(getCellValue(row.getCell(colComercio)));
 
             // Campos Numéricos (Terminal)
@@ -107,7 +120,7 @@ public class ExcelImportService {
                     // Limpiar puntos de miles si existen
                     p.setTerminal(Integer.parseInt(terminalStr.replace(".", "").replace(",", "")));
                 } catch (NumberFormatException e) {
-                    System.err.println("Error formato terminal fila " + i + ": " + terminalStr);
+                    log.warn("Pinpads fila {}: terminal con formato no numérico '{}'", i + 1, terminalStr);
                 }
             }
 
@@ -115,10 +128,11 @@ public class ExcelImportService {
             // --- RELACIÓN CON EL ORDENADOR ---
             String pcNom = getCellValue(row.getCell(colPc)).trim(); // Añadido trim()
             if (!pcNom.isEmpty() && !pcNom.equalsIgnoreCase("nan")) {
-                // Buscamos el PC por su identificador visual (C0XXX)
-                (actiuRepository.findByNom(pcNom)).ifPresent(comp -> {
-                    p.setOrdenadorConectado((Ordinador) comp);
-                });
+                // Buscamos el PC por su identificador visual (C0XXX). Solo entre ordenadores, y el primero
+                // si hay repetidos (findByNom de Actiu fallaba con duplicados o al encontrar un pinpad).
+                computerRepository.findByNom(pcNom).stream().findFirst()
+                        .ifPresentOrElse(p::setOrdenadorConectado,
+                                () -> log.warn("Pinpads fila {}: no existe el PC '{}'", row.getRowNum() + 1, pcNom));
             }
 
             // --- CORRECCIÓN EN ENTIDAD ---
@@ -131,8 +145,8 @@ public class ExcelImportService {
             p.setVersionSo(getCellValue(row.getCell(colSo))); // Versión SO
             p.setClaveComercio(getCellValue(row.getCell(colClaveComercio)));
 
-            // Estado Activo (ya filtrado por INSTAL)
-            p.setEstat(1);
+            // En uso: la hoja ya viene filtrada por INSTAL
+            p.setEstat(EstatActiu.EN_US);
 
             list.add(p);
         }
@@ -163,12 +177,11 @@ public class ExcelImportService {
             c.setObservacions(getCellValue(row.getCell(35))); // Col AJ
             c.setPurchaseDate(parseDateRobust(row.getCell(33))); // Col AD
 
-            // Estado por color (Miramos la celda del serial o la primera)
-            c.setEstat(determinarEstadoPorColor(row.getCell(9)));
+            // Estado por el formato de la fila (celda clave: el serial)
+            c.setEstat(EstatDetector.detectar(row, 9));
 
             list.add(c);
-            System.out.println("Procesado CPU: " + c.getNom() + " - Serial: " + c.getSerialNumber() + " - Estado: "
-                    + c.getEstat());
+            log.debug("Procesado CPU: {} - Serial: {} - Estado: {}", c.getNom(), c.getSerialNumber(), c.getEstat());
         }
         return list;
     }
@@ -221,7 +234,8 @@ public class ExcelImportService {
             c.setPurchaseDate(parseDateRobust(row.getCell(21))); // Col V
             c.setObservacions(getCellValue(row.getCell(20))); // Col U (Comentaris)
 
-            c.setEstat(determinarEstadoPorColor(row.getCell(0)));
+            // Estado por el formato de la fila (celda clave: el nº de inventario)
+            c.setEstat(EstatDetector.detectar(row, 0));
 
             list.add(c);
         }
@@ -271,22 +285,6 @@ public class ExcelImportService {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private Integer determinarEstadoPorColor(Cell cell) {
-        if (cell == null)
-            return 0;
-        CellStyle style = cell.getCellStyle();
-        short colorIndex = style.getFillForegroundColor();
-
-        // Rojo (10) o Amarillo (13)
-        if (colorIndex == IndexedColors.RED.getIndex() || colorIndex == IndexedColors.ROSE.getIndex()) {
-            return 2; // Baja
-        } else if (colorIndex == IndexedColors.YELLOW.getIndex()
-                || colorIndex == IndexedColors.LIGHT_YELLOW.getIndex()) {
-            return 1; // En revisión
-        }
-        return 0; // Activo
     }
 
     private String getCellValue(Cell cell) {

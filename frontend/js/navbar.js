@@ -43,6 +43,12 @@ function renderNavbar() {
             <div class="collapse navbar-collapse" id="navbarInventario">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     ${links}
+                    <!-- Documentación de la API (Swagger), relativa para que funcione también detrás del hub -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="api/docs" target="_blank" rel="noopener" title="Documentación de la API (Swagger)">
+                            <i class="bi bi-braces me-1"></i>API
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

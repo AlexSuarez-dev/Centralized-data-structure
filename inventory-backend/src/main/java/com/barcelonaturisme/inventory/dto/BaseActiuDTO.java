@@ -1,5 +1,7 @@
 package com.barcelonaturisme.inventory.dto;
 
+import com.barcelonaturisme.inventory.model.EstatActiu;
+
 import lombok.Data;
 
 @Data
@@ -9,5 +11,5 @@ public abstract class BaseActiuDTO {
     private String model;
     private String serialNumber;
     private String ubicacio;
-    private Integer estat;
+    private EstatActiu estat;
 }
